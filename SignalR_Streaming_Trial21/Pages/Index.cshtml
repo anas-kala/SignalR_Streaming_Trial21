@@ -1,0 +1,80 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+
+
+<canvas id="myChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [{
+                label: 'My First dataset',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: [0, 10, 5, 2, 20, 30, 45]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+</script>
+
+
+
+
+<div>
+    <h5>SignalR Streaming: </h5>
+    <br />
+    <ul id="messagesList">
+    </ul>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder().withUrl("/hub").build();
+    async function start() {
+        try {
+            await connection.start();
+            console.log("connected");
+
+            connection.stream("Counter", 10, 500)
+                .subscribe({
+                    next: (item) => {
+                        console.log("connected");
+                        var li = document.createElement("li");
+                        li.textContent = item;
+                        document.getElementById("messagesList").appendChild(li);
+                    },
+                    complete: () => {
+                        var li = document.createElement("li");
+                        li.textContent = "Stream completed";
+                        document.getElementById("messagesList").appendChild(li);
+                    },
+                    error: (err) => {
+                        var li = document.createElement("li");
+                        li.textContent = err;
+                        document.getElementById("messagesList").appendChild(li);
+                    },
+                });
+
+        } catch (err) {
+            console.log(err);
+            setTimeout(() => start(), 5000);
+        }
+    };
+    start();
+</script>
+
+
