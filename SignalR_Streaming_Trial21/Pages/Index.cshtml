@@ -23,11 +23,21 @@
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgb(255, 99, 132)',
                 data: [0, 10, 5, 2, 20, 30, 45]
+                
             }]
         },
 
         // Configuration options go here
-        options: {}
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        suggestedMin: 100,
+                        suggestedMax: 100
+                    }
+                }]
+            }
+        }
     });
 </script>
 
@@ -49,10 +59,13 @@
             await connection.start();
             console.log("connected");
 
-            connection.stream("Counter", 10, 500)
+            connection.stream("Counter", 20, 500)
                 .subscribe({
                     next: (item) => {
                         console.log("connected");
+                        console.log(item);
+                        chart.data.datasets[0].data = item.split(",");
+                        chart.update();
                         var li = document.createElement("li");
                         li.textContent = item;
                         document.getElementById("messagesList").appendChild(li);
